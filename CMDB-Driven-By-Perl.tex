@@ -1,0 +1,563 @@
+\documentclass[ngerman,xcolor={table,dvipsnames},smaller,compress,hyperref={bookmarks,colorlinks}]{beamer}%,handout
+
+\usepackage{url}
+\usepackage{listings}
+\usepackage[latin9]{inputenc}
+\usepackage{textcomp}
+%\usepackage{auto-pst-pdf}
+\usepackage{graphicx}
+\usepackage{pstricks}
+\usepackage{pst-node}
+\usepackage{pst-uml}
+\usepackage{pst-tree}
+\usepackage{pst-blur}
+
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{pifont}
+
+% for multipage tables (xtab or longtable
+\usepackage{longtable}
+\usepackage{lscape}
+\usepackage{booktabs}
+\usepackage[tableposition=top]{caption}
+
+\title{CMDB Driven by Perl}
+\author{Jens Rehsack}
+\institute[Niederrhein.PM]{Niederrhein Perl Mongers}
+\date{Niederrhein.PM Meeting June 2017}
+
+\usetheme[secheader]{Boadilla}
+\setbeamertemplate{navigation symbols}{}
+
+\newcommand{\perlfilename}[1]{{\color{cyan}{\textit{\begingroup \urlstyle{sf}\Url{#1}}}}}
+\newcommand{\xsfilename}[1]{{\color{olive}{\textit{\begingroup \urlstyle{sf}\Url{#1}}}}}
+\newcommand{\hfilename}[1]{{\color{olive}{\textit{\begingroup \urlstyle{sf}\Url{#1}}}}}
+\newcommand{\cfilename}[1]{{\color{magenta}{\textit{\begingroup \urlstyle{sf}\Url{#1}}}}}
+\newcommand{\variable}[1]{{\color{violet}{\textsf{#1}}}}
+\newcommand{\variablew}[1]{{{\textsf{#1}}}}
+\newcommand{\command}[1]{'\texttt{#1}'}
+
+\def\signed #1{{\leavevmode\unskip\nobreak\hfil\penalty50\hskip2em
+   \hbox{}\nobreak\hfil(#1)%
+   \parfillskip=0pt \finalhyphendemerits=0 \endgraf}}
+ 
+\newsavebox\mybox
+\newenvironment{aquote}[1]
+   {\savebox\mybox{#1}\begin{quotation}}
+   {\signed{\usebox\mybox}\end{quotation}}
+
+\makeatletter
+\makeatother
+
+\begin{document}
+
+\psset{angleA=90,angleB=-90}
+\lstset{language=Perl,
+        basicstyle=\ttfamily,
+        keywordstyle=\color{Maroon},
+        commentstyle=\color{Blue}, 
+        stringstyle=\color{Green},
+        showstringspaces=false}
+
+\AtBeginPart{\begin{frame}<beamer> \frametitle{Overview} \partpage \tableofcontents[current] \end{frame}}
+
+\frame{\maketitle}
+
+\part{Introduction}
+
+\section{Introduction}
+
+\subsection{Motivation}
+
+\begin{frame}[fragile]{Motivation}
+\begin{block}{Progress}
+\begin{aquote}{Robert A. Heinlein}
+Progress isn't made by early risers. It's made by lazy men trying to find easier ways to do something. \\
+\end{aquote}
+\end{block}
+\end{frame}
+
+\begin{frame}[fragile]{Motivation}
+\begin{block}{Efficiency}
+\begin{aquote}{Elizabeth Mattijsen}
+Business success is because of Perl. It enables us to deliver right solutions in days instead of months. \\
+\end{aquote}
+\end{block}
+\end{frame}
+
+\begin{frame}[fragile]{Goal}
+\begin{block}{Automation}
+Full flavoured systems management
+\begin{itemize}
+\item<2-> Installation without Administrator interaction
+\item<3-> Ensured system state by actual-theoretical comparison
+\item<4-> Faster reaction in emergency cases by organized component moving
+\item<5-> Control sensors and alarming
+\end{itemize}
+\end{block}
+\end{frame}
+
+\part{Challenge}
+
+\section{Beginning}
+
+\subsection{Taking over}
+
+\begin{frame}[fragile]{Begin with reporting}
+\begin{block}{Begin with reporting}
+In the beginning was the (Installation-)Report
+\begin{itemize}
+\item<2-> Technical Sales defined an XML Document for Change Requests and Status Reports
+\item<3-> Document Definition lacks entity-relations
+\item<4-> Document Definition misses technolgy requirements
+\item<5-> Based on work of forerunner a 70\% solution could be delivered
+\end{itemize}
+\end{block}
+\end{frame}
+
+\subsection{After reporting}
+
+\begin{frame}[fragile]{From reporting to \ldots}
+\begin{block}{Mind the goal}
+\begin{aquote}{Lewis Carroll}
+Alice: Would you tell me, please, which way I ought to go from here? \\
+The Cheshire Cat: That depends a good deal on where you want to get to. \\
+\end{aquote}
+\end{block}
+\end{frame}
+
+\subsection{Baby Steps}
+
+\begin{frame}[fragile]{Baby Steps}
+\begin{block}<1->{Improve knowledge}
+Based on identified issues the first goal had to be to identify all entities and their relations together
+\end{block}
+\begin{block}<2->{Surrounded}
+Problem: The entire platform was completely unstructured
+\end{block}
+\end{frame}
+
+\subsection{Mine Sweeper}
+
+\begin{frame}[fragile]{Baby Steps}
+\begin{block}{Multiple Beginnings}
+\begin{itemize}
+\item The already know ''(Installation-)Report''
+\item<2-> Platform Snapshot (SCM Repository of selected configuration files)
+\item<3-> Puppet Classes (without \textit{Hiera}) mixed of \textit{Configuration Items} and prepared configuration files (unsupervised)
+\end{itemize}
+\end{block}
+\end{frame}
+
+\part{Sweat}
+
+\section{Concerns}
+
+\subsection{Identifying}
+
+\begin{frame}[fragile]{Concerns}
+\begin{block}{Rough}
+\begin{itemize}
+\item Collecting of platform parameters (to access them in SQL'ish way)
+\item<2-> Identify coherences of \textit{Configuration Items}
+\item<3-> Define a data model for \textit{Configuration Management Database}
+\item<4-> Define technical requirements of our \texttt{CMDB} incarnation
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}[fragile]{Concerns}
+\begin{block}{Techical}
+\begin{itemize}
+\item validity of \texttt{CI}'s
+\item<2-> limits of our \texttt{CI}'s
+\item<3-> data ownership of \texttt{CI}'s
+\item<4-> methods to access \texttt{CMDB}
+\item<5-> permission management
+\end{itemize}
+\end{block}
+\end{frame}
+
+\subsection{Separation}
+
+\begin{frame}[fragile]{}
+\begin{block}{}
+
+\resizebox{\textwidth}{!}{
+\begin{pspicture}(-7,-5)(7,5)%\psgrid
+     % 
+     \uput{4}[90](0,0){\rnode{platform}{\umlClass{\underline{:platform}}{}}}
+     \uncover<2->{\uput{4}[18](0,0){\rnode{snapshot}{\umlClass{\underline{:snapshot}}{}}}}
+     \uncover<3->{\uput{4}[306](0,0){\rnode{scandb}{\umlClass{\underline{:scan\_db}}{}}}}
+     \uncover<4->{\uput{4}[234](0,0){\rnode{cmdb}{\umlClass{\underline{:cmdb}}{}}}}
+     \uncover<5->{\uput{4}[162](0,0){\rnode{hiera}{\umlClass{\underline{:hiera}}{}}}}
+     \uncover<8->{\rput(-6,-4){\rnode{report}{\umlClass{\underline{:report}}{}}}}
+
+     \uncover<2->{\ncarc[arcangle=30,linewidth=0.5pt,linestyle=solid]{->}{platform}{snapshot}\naput*[Ynodesep=0.5]{collect}}
+     \uncover<3->{\ncarc[arcangle=30,linewidth=0.5pt,linestyle=solid]{->}{snapshot}{scandb}\naput*[Ynodesep=0.5]{scan}}
+     \uncover<4->{\ncarc[arcangle=30,linewidth=0.5pt,linestyle=solid]{->}{scandb}{cmdb}\naput*[Ynodesep=0.5]{process-scan}}
+     \uncover<5->{\ncarc[arcangle=30,linewidth=0.5pt,linestyle=solid]{->}{cmdb}{hiera}\naput*[Ynodesep=0.5]{yaml-gen}}
+     \uncover<6->{\ncarc[arcangle=30,linewidth=0.5pt,linestyle=solid]{->}{hiera}{platform}\naput*[Ynodesep=0.5]{puppet run}}
+     \uncover<7->{\nccircle[angleA=-40,angleB=90,arm=.8,linearc=.2,linewidth=0.5pt,linestyle=solid]{->}{cmdb}{1cm}\naput*[Ynodesep=0.5]{CRQ}}
+     \uncover<8->{\ncarc[arcangle=30,linewidth=0.5pt,linestyle=solid]{->}{cmdb}{report}\naput*[Ynodesep=0.5]{export}}
+
+\end{pspicture}
+}%end resizebox
+
+\end{block}
+\end{frame}
+
+\section{Tuck In!}
+
+\subsection{MI:5}
+
+\begin{frame}[fragile]{Where do I begin}
+\begin{block}{To write the workflow how great Perl 5 can be}
+\begin{itemize}
+\item The project was in a state where a developer created a particular Report based on the existing snapshot.
+\item<2-> This solution did not maintain an abstraction layer for gathered data - every time when the report needs an extension, an end-to-end (snapshot to XML-Tag) enhancement had to be created.
+\item<3-> Changes shall be deployed from the same report format as installations are reported.
+\item<4-> We have to be able to say at any moment what is operated on the platform.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}[fragile]{Impossible Things}
+\begin{block}{Impossible Things}
+\begin{aquote}{Lewis Carroll}
+Alice laughed. ''There's no use trying,'' she said: ''one can't believe impossible things.'' \\
+\hfil \\
+''I daresay you haven't had much practice,'' said the Queen. ''When I was your age,
+I always did it for half-an-hour a day. Why, sometimes I've believed as many as six
+impossible things before breakfast.''
+\end{aquote}
+\end{block}
+\end{frame}
+
+\subsection{Home Improvement}
+
+\begin{frame}[fragile]{The Fool with the Tool}
+\begin{block}{Try again}
+So we closed our eyes, took a deep breath (multiple times) and looked around for tools to store serialized data and read in structured way \ldots
+\end{block}
+\begin{block}<2->{Tool Time}
+\begin{description}
+\item<2->{MongoDB} Allows easy storing in any format - but lacks strucured querying dedicated entities (configuration items)
+\item<3->{Data Files} Delegates relationship handling completely to business logic
+\item<4->{AnyData2} Gotcha - allows reading most confusing stuff and could be queried in structured way
+\end{description}
+\end{block}
+\end{frame}
+
+\begin{frame}[fragile]{\ldots is still a Fool}
+\begin{block}{Volatile Structure}
+\begin{itemize}
+\item Persist structured data using SQLite
+\item<2-> Define a data model representing existing relations
+\item<3-> Develop AnyData2::Format classes representing defined ER model
+\item<4-> Develop MOP inside this AnyData2 instance to manage attributes vs. columns
+\item<5-> Glue everything together using SQL
+\end{itemize}
+\uncover<6->{The entire ER model keeps a moving target}
+\end{block}
+\end{frame}
+
+\subsection{Clean Picture}
+
+\begin{frame}[fragile]{Abstraction Layer}
+\begin{block}{\ldots of configured components}
+\begin{itemize}
+\item concentrate of the goal to know what is operated
+\item<2-> depth first search over all compoenent configuration files
+\item<3-> identify relationships (remember: the is no operation model at all)
+\item<4-> clean up configuration when no reasonable relationships can be resolved or relationships are conflicting
+\end{itemize}
+\end{block}
+\end{frame}
+
+\subsection{Control}
+
+\begin{frame}[fragile]{Moo in practice}
+\begin{block}{Moo in practice}
+It appears that the tools helped at safe IoT device updating are the same tools helping to coordinate CI determining:
+\begin{description}
+\item<2->{\texttt{MooX::Cmd}} helps separating concerns
+\item<3->{\texttt{MooX::ConfigFromFile}} helps contribute ''divine wisdom''
+\item<4->{\texttt{MooX::Log::Any}} feeds \texttt{DBIx::LogAny}
+\end{description}
+\end{block}
+\end{frame}
+
+\begin{frame}[fragile]{Moo in background}
+\begin{block}{Moo in background}
+\begin{itemize}
+\item manage database connections based on concerns
+\item<2-> manage \texttt{CI} structures based on relations
+\item<3-> manage Web-API integration
+\end{itemize}
+\end{block}
+\end{frame}
+
+\subsection{Reflecting Relationships}
+
+\begin{frame}[fragile]{}
+\begin{block}{Crazy}
+\begin{aquote}{Lewis Carroll}
+I'm not crazy. My reality is just different than yours. \\
+\hfil \\
+The Cheshire Cat \\
+\end{aquote}
+\end{block}
+\end{frame}
+
+\begin{frame}[fragile]{}
+\begin{block}{Harmonize Craziness}
+\begin{itemize}
+\item practically any administrator had a different background regarding to the platform components thus a different picture of their relationships
+\item<2-> EPIC battles leads to common craziness
+\item<3-> ER model analysis sessions uncover holes in picture
+\end{itemize}
+\end{block}
+\end{frame}
+
+\subsection{Meanwhile}
+
+\begin{frame}[fragile]{}
+\begin{block}{}
+\begin{aquote}{Lewis Carroll}
+March Hare: Have some wine. \\
+(Alice looked all round the table, but there was nothing on it but tea.) \\
+Alice: I don't see any wine. \\
+\hfil \\
+March Hare: There isn't any. \\
+Alice: Then it wasn't very civil of you to offer it. \\
+March Hare: It wasn't very civil of you to sit down without being invited. \\
+\end{aquote}
+\end{block}
+\end{frame}
+
+\begin{frame}[fragile]{New Goal}
+\begin{block}{CentOS 5 ends it's maintenance}
+\begin{itemize}
+\item many of existing tools needs to be upgraded
+\item<2-> Upgraded tools don't support existing hacks anymore
+\item<3-> existing hacks must be replaced by a reasonable configuration structure
+\item<4-> Same problem like the report format:
+\begin{itemize}
+\item<5-> neither the ER model of platform components nor issues of platform where known
+\item<6-> neither cared about
+\end{itemize}
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}[fragile]{Self Protection}
+\begin{block}{Delegation}
+We learned from mistakes of past:
+\begin{itemize}
+\item<2-> No responsibility taken for fill weird puppet templates
+\item<3-> No external data will be managed
+\item<4-> No precompiled/puzzled resources are prepared
+\item[$\rightarrow$]<5-> ER model of \texttt{CMDB} is presented via \textit{RESTful API}
+\end{itemize}
+\end{block}
+\end{frame}
+
+\subsection{Merging Pictures}
+
+\begin{frame}[fragile]{}
+\begin{block}{Scan completed}
+\begin{itemize}
+\item Early implementation of above mentioned \textit{RESTful API} run against \textit{ScanDB}
+\item<2-> \textit{ScanDB} represents just a view of the configuration snapshot
+\item<3-> There is no future\uncover<4->{, neither past}
+\item<5-> Time for \textit{CMDB} to enter the stage
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}[fragile]{}
+\begin{block}{Future and Past}
+\scriptsize
+\begin{lstlisting}[language=SQL,inputencoding=latin9,escapeinside={(*@}{@*)}]
+CREATE TABLE author
+(
+      author_id INTEGER PRIMARY KEY
+    -- entity stuff
+    , author_name VARCHAR(80) NOT NULL
+    , author_birthday DATETIME NOT NULL
+    , author_died_at DATETIME
+    -- cmdb stuff
+    , valid_from DATETIME NOT NULL
+    , valid_to DATETIME
+    , modified_at DATETIME NOT NULL
+    , modified_by VARCHAR(32) NOT NULL
+);
+\end{lstlisting}
+\end{block}
+\end{frame}
+
+\begin{frame}[fragile]{}
+\begin{block}{Future and Past}
+\scriptsize
+\begin{lstlisting}[language=SQL,inputencoding=latin9,escapeinside={(*@}{@*)}]
+CREATE TABLE book
+(
+      book_id INTEGER PRIMARY KEY
+    -- entity stuff
+    , book_name VARCHAR(80) NOT NULL
+    , book_subtitle VARCHAR(80)
+    , book_edition INTEGER
+    -- cmdb stuff
+    , valid_from DATETIME NOT NULL
+    , valid_to DATETIME
+    , modified_at DATETIME NOT NULL
+    , modified_by VARCHAR(32) NOT NULL
+);
+\end{lstlisting}
+\end{block}
+\end{frame}
+
+\begin{frame}[fragile]{}
+\begin{block}{Future and Past}
+\scriptsize
+\begin{lstlisting}[language=SQL,inputencoding=latin9,escapeinside={(*@}{@*)}]
+CREATE TABLE book_athors
+(
+      ba_id INTEGER PRIMARY KEY
+    -- entity stuff
+    , author_id INTEGER NOT NULL
+    , book_id INTEGER NOT NULL
+    -- cmdb stuff
+    , valid_from DATETIME NOT NULL
+    , valid_to DATETIME
+    , modified_at DATETIME NOT NULL
+    , modified_by VARCHAR(32) NOT NULL
+    -- 
+    , FOREIGN KEY (author_id) REFERENCES author(author_id) ON DELETE CASCADE
+    , FOREIGN KEY (book_id) REFERENCES book(book_id) ON DELETE CASCADE
+    , CONSTRAINT no_dup_book_author UNIQUE (author_id, book_id)
+);
+\end{lstlisting}
+\end{block}
+\end{frame}
+
+\subsection{Features}
+
+\begin{frame}[fragile]{}
+\begin{block}{''UPSERT''}
+\scriptsize
+\begin{lstlisting}[language=SQL,inputencoding=latin9,escapeinside={(*@}{@*)}]
+ MERGE INTO tablename USING table_reference ON (condition)
+   WHEN MATCHED THEN
+   UPDATE SET column1 = value1 [, column2 = value2 ...]
+   WHEN NOT MATCHED THEN
+   INSERT (column1 [, column2 ...]) VALUES (value1 [, value2 ...]);
+\end{lstlisting}
+\end{block}
+
+\begin{block}<2->{SQLite}
+\begin{itemize}
+\item<2-> Unsupported by SQLite
+\item<3-> \lstinline[language=SQL,inputencoding=latin9]!INSERT OR REPLACE! deletes before insert
+\item[$\rightarrow$]<4-> Kills \texttt{UPDATE} Trigger
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}[fragile]{}
+\begin{block}{Perl helps out}
+\scriptsize
+\begin{lstlisting}[language=Perl,inputencoding=latin9,escapeinside={(*@}{@*)}]
+{
+    my $goethe_id = $self->cmdb->upsert( "author",
+      { author_name => "Johann Wolfgang von Goethe",
+        author_birthday => "28 August 1749",
+	author_died_at => "22 March 1832" } )->[0]->[0];
+    my $faust_id = $self->cmdb->upsert( "book",
+      { book_name => "Faust. Der Tragödie erster Teil" } )->[0]->[0];
+    my $faust_author => $self->cmdb->upsert( "book_athors",
+      { author_id => $goethe_id, book_id => $faust_id } )->[]->[];
+}
+\end{lstlisting}
+\end{block}
+
+\begin{block}<2->{}
+\begin{itemize}
+\item Limited to CMDB
+\item<3-> Refuse updates of identifying columns (UNIQUE constraints)
+\item<4-> WHERE clause derived from UNIQUE constraints
+\end{itemize}
+\end{block}
+\end{frame}
+
+\subsection{Meanwhile II}
+
+\begin{frame}[fragile]{CMDB to Hiera}
+\begin{block}{YAML Generator}
+\begin{itemize}
+\item Development team read via \textit{RESTful API} the theoretical configuration set
+\item<2-> \textit{Hiera} \texttt{YAML} files are written
+\item<3-> additional exports are managed via \textit{Hiera}
+\item<4-> Puppet classes are rewritten to understand new ER model
+\end{itemize}
+\end{block}
+\end{frame}
+
+%  “You're entirely bonkers. But I'll tell you a secret: All the best people are.”
+% ― Lewis Carroll, Alice in Wonderland
+
+%\begin{frame}[fragile]{}
+%\begin{block}{}
+%\end{block}
+%\end{frame}
+
+\part{Finish}
+
+\section{Goals reached}
+
+\begin{frame}[fragile]{}
+\begin{block}{Goals reached}
+\begin{itemize}
+\item[$\rightarrow$] Circle closed
+\item[$\rightarrow$]<2-> actual-theoretical comparison done via processing scan database
+\item[$\rightarrow$]<3-> unmaintainted installation via cronjob possible
+\item[$\rightarrow$]<4-> reaction in emergency cases by organized component moving done multiple times
+\item[$\rightarrow$]<5-> monitoring, sensors, alarming open
+\end{itemize}
+\end{block}
+\end{frame}
+
+\section{Conclusion}
+
+\begin{frame}[fragile]{Conclusion}
+\begin{block}{Can a programming language save a life}
+\begin{itemize}
+\item Yes, it can - but here is saves our business
+\end{itemize}
+\end{block}
+\end{frame}
+
+\section{Thank you}
+
+\subsection{Hiring}
+
+\begin{frame}[fragile]{We are hiring}
+\begin{block}{New Job?}
+Ask me for details
+\end{block}
+\end{frame}
+
+\subsection{Thank you}
+
+% THANKS
+\begin{frame}[fragile]{Thank You For Listening}
+\begin{block}{Questions?}
+Jens Rehsack \textless{}\href{mailto:rehsack@cpan.org}{rehsack@cpan.org}\textgreater{} \\
+Cologne
+\end{block}
+\end{frame}
+
+\end{document}
