@@ -24,9 +24,10 @@
 \usepackage[tableposition=top]{caption}
 
 \title{CMDB Driven by Perl}
+\subtitle{Road to a Perl "driven" Configuration Management Database}
 \author{Jens Rehsack}
 \institute[Niederrhein.PM]{Niederrhein Perl Mongers}
-\date{Niederrhein.PM Meeting June 2017}
+\date{The Perl Conference in Amsterdam}
 
 \usetheme[secheader]{Boadilla}
 \setbeamertemplate{navigation symbols}{}
@@ -92,9 +93,10 @@ Business success is because of Perl. It enables us to deliver right solutions in
 Full flavoured systems management
 \begin{itemize}
 \item<2-> Installation without Administrator interaction
-\item<3-> Ensured system state by actual-theoretical comparison
-\item<4-> Faster reaction in emergency cases by organized component moving
-\item<5-> Control sensors and alarming
+\item<3-> Control sensors and alarming
+\item<4-> Ensured system state by actual-theoretical comparison
+\item<5-> Faster reaction in emergency cases by organized component moving
+\item<6-> Have an up-to-date ''Operation Handbook'' as well as archiving them
 \end{itemize}
 \end{block}
 \end{frame}
@@ -110,9 +112,10 @@ Full flavoured systems management
 In the beginning was the (Installation-)Report
 \begin{itemize}
 \item<2-> Technical Sales defined an XML Document for Change Requests and Status Reports
-\item<3-> Document Definition lacks entity-relations
-\item<4-> Document Definition misses technolgy requirements
-\item<5-> Based on work of forerunner a 70\% solution could be delivered
+\item<3-> Based on work of forerunner a 70\% solution could be delivered
+\item<4-> Document Definition lacks entity-relations
+\item<5-> Document Definition misses technolgy requirements
+\item[$\Rightarrow$]<6-> Appears to be a dead end
 \end{itemize}
 \end{block}
 \end{frame}
@@ -128,6 +131,19 @@ The Cheshire Cat: That depends a good deal on where you want to get to. \\
 \end{block}
 \end{frame}
 
+\subsection{Mine Sweeper}
+
+\begin{frame}[fragile]{Where do I begin}
+\begin{block}{To write the workflow how great Perl 5 can be}
+\begin{itemize}
+\item The project was in a state where a developer created a particular Report based on the existing snapshot.
+\item<2-> This solution did not maintain an abstraction layer for gathered data - every time when the report needs an extension, an end-to-end (snapshot to XML-Tag) enhancement had to be created.
+\item<3-> Changes shall be deployed from the same report format as installations are reported.
+\item<4-> We have to be able to say at any moment what is operated on the platform.
+\end{itemize}
+\end{block}
+\end{frame}
+
 \subsection{Baby Steps}
 
 \begin{frame}[fragile]{Baby Steps}
@@ -139,53 +155,29 @@ Problem: The entire platform was completely unstructured
 \end{block}
 \end{frame}
 
-\subsection{Mine Sweeper}
-
 \begin{frame}[fragile]{Baby Steps}
 \begin{block}{Multiple Beginnings}
 \begin{itemize}
-\item The already know ''(Installation-)Report''
+\item The already known ''(Installation-)Report''
 \item<2-> Platform Snapshot (SCM Repository of selected configuration files)
-\item<3-> Puppet Classes (without \textit{Hiera}) mixed of \textit{Configuration Items} and prepared configuration files (unsupervised)
+\item<3-> Puppet Classes (without \textit{Hiera}) mixed with \textit{Configuration Items} (within \textit{Hiera}) and prepared configuration files (unsupervised)
+\begin{description}[Hiera]
+\item[Hiera]<4-> is Puppet's built-in key/value data lookup system. By default, it uses simple YAML or JSON files, although one can extend it to work with almost any data source.
+\end{description}
 \end{itemize}
 \end{block}
 \end{frame}
 
 \part{Sweat}
 
-\section{Concerns}
-
-\subsection{Identifying}
-
-\begin{frame}[fragile]{Concerns}
-\begin{block}{Rough}
-\begin{itemize}
-\item Collecting of platform parameters (to access them in SQL'ish way)
-\item<2-> Identify coherences of \textit{Configuration Items}
-\item<3-> Define a data model for \textit{Configuration Management Database}
-\item<4-> Define technical requirements of our \texttt{CMDB} incarnation
-\end{itemize}
-\end{block}
-\end{frame}
-
-\begin{frame}[fragile]{Concerns}
-\begin{block}{Techical}
-\begin{itemize}
-\item validity of \texttt{CI}'s
-\item<2-> limits of our \texttt{CI}'s
-\item<3-> data ownership of \texttt{CI}'s
-\item<4-> methods to access \texttt{CMDB}
-\item<5-> permission management
-\end{itemize}
-\end{block}
-\end{frame}
+\section{World Domination}
 
 \subsection{Separation}
 
-\begin{frame}[fragile]{}
+\begin{frame}[fragile]{Circle in the Sand}
 \begin{block}{}
 
-\resizebox{\textwidth}{!}{
+\resizebox{0.9\textwidth}{!}{
 \begin{pspicture}(-7,-5)(7,5)%\psgrid
      % 
      \uput{4}[90](0,0){\rnode{platform}{\umlClass{\underline{:platform}}{}}}
@@ -209,20 +201,39 @@ Problem: The entire platform was completely unstructured
 \end{block}
 \end{frame}
 
-\section{Tuck In!}
+\section{Concerns}
 
-\subsection{MI:5}
+\subsection{Identifying}
 
-\begin{frame}[fragile]{Where do I begin}
-\begin{block}{To write the workflow how great Perl 5 can be}
+\begin{frame}[fragile]{Technical Concerns}
+\begin{block}{Rough}
 \begin{itemize}
-\item The project was in a state where a developer created a particular Report based on the existing snapshot.
-\item<2-> This solution did not maintain an abstraction layer for gathered data - every time when the report needs an extension, an end-to-end (snapshot to XML-Tag) enhancement had to be created.
-\item<3-> Changes shall be deployed from the same report format as installations are reported.
-\item<4-> We have to be able to say at any moment what is operated on the platform.
+\item Collecting platform parameters (to query them in structured way)
+\item<2-> Identify coherences of \textit{Configuration Items} (CI)
+\item<3-> Define a data model
+\item<4-> Define technical requirements
 \end{itemize}
 \end{block}
 \end{frame}
+
+\begin{frame}[fragile]{Practical Concerns}
+\begin{block}{Practical}
+\begin{itemize}
+\item Validity of \texttt{CI}'s
+\item<2-> Limits of our \texttt{CI}'s
+\item<3-> Data ownership of \texttt{CI}'s
+\item<4-> Methods to persist \texttt{CI}'s
+\item<5-> Methods to access \texttt{CI}'s
+\item<6-> Permission management
+\end{itemize}
+\end{block}
+\end{frame}
+
+\section{Tuck In!}
+
+\begin{frame}<beamer> \frametitle{Overview} \partpage \tableofcontents[current] \end{frame}
+
+\subsection{MI:5}
 
 \begin{frame}[fragile]{Impossible Things}
 \begin{block}{Impossible Things}
@@ -238,15 +249,15 @@ impossible things before breakfast.''
 
 \subsection{Home Improvement}
 
-\begin{frame}[fragile]{The Fool with the Tool}
+\begin{frame}[fragile]{The Fool with a Tool}
 \begin{block}{Try again}
 So we closed our eyes, took a deep breath (multiple times) and looked around for tools to store serialized data and read in structured way \ldots
 \end{block}
 \begin{block}<2->{Tool Time}
-\begin{description}
-\item<2->{MongoDB} Allows easy storing in any format - but lacks strucured querying dedicated entities (configuration items)
-\item<3->{Data Files} Delegates relationship handling completely to business logic
-\item<4->{AnyData2} Gotcha - allows reading most confusing stuff and could be queried in structured way
+\begin{description}[Data Files]
+\item[MongoDB]<2-> allows easy storing in any format - but lacks structured querying dedicated entities (configuration items)
+\item[Data Files]<3-> delegate relationship handling completely to business logic
+\item[AnyData2]<4-> gotcha - allows reading most confusing stuff and could be queried in structured way
 \end{description}
 \end{block}
 \end{frame}
@@ -256,11 +267,11 @@ So we closed our eyes, took a deep breath (multiple times) and looked around for
 \begin{itemize}
 \item Persist structured data using SQLite
 \item<2-> Define a data model representing existing relations
-\item<3-> Develop AnyData2::Format classes representing defined ER model
-\item<4-> Develop MOP inside this AnyData2 instance to manage attributes vs. columns
+\item<3-> Develop \texttt{AnyData2::Format} classes representing defined ER (\textit{Entity Relationship}) model
+\item<4-> Develop simple MOP inside this AnyData2 instance to manage attributes vs. columns
 \item<5-> Glue everything together using SQL
 \end{itemize}
-\uncover<6->{The entire ER model keeps a moving target}
+\uncover<6->{The entire ER model remains a moving target}
 \end{block}
 \end{frame}
 
@@ -269,10 +280,10 @@ So we closed our eyes, took a deep breath (multiple times) and looked around for
 \begin{frame}[fragile]{Abstraction Layer}
 \begin{block}{\ldots of configured components}
 \begin{itemize}
-\item concentrate of the goal to know what is operated
-\item<2-> depth first search over all compoenent configuration files
-\item<3-> identify relationships (remember: the is no operation model at all)
-\item<4-> clean up configuration when no reasonable relationships can be resolved or relationships are conflicting
+\item Focus the goal to know what is operated
+\item<2-> Depth first search over all component configuration files
+\item<3-> Identify relationships (remember: there is no operation model at all)
+\item<4-> Clean up configuration when no reasonable relationships can be resolved or relationships are conflicting
 \end{itemize}
 \end{block}
 \end{frame}
@@ -281,11 +292,12 @@ So we closed our eyes, took a deep breath (multiple times) and looked around for
 
 \begin{frame}[fragile]{Moo in practice}
 \begin{block}{Moo in practice}
-It appears that the tools helped at safe IoT device updating are the same tools helping to coordinate CI determining:
-\begin{description}
-\item<2->{\texttt{MooX::Cmd}} helps separating concerns
-\item<3->{\texttt{MooX::ConfigFromFile}} helps contribute ''divine wisdom''
-\item<4->{\texttt{MooX::Log::Any}} feeds \texttt{DBIx::LogAny}
+It appears that the tools helping to do safe IoT device updating are the same tools helping to coordinate CI determining:
+\begin{description}[\texttt{MooX::ConfigFromFile}]
+\item[\texttt{MooX::Cmd}]<2-> helps separating concerns
+\item[\texttt{MooX::ConfigFromFile}]<3-> helps contribute ''divine wisdom''
+\item[\texttt{MooX::Options}]<4-> allow overriding ''divine wisdom'' by ''individual wisdom''
+\item[\texttt{MooX::Log::Any}]<5-> feeds \texttt{DBIx::LogAny}
 \end{description}
 \end{block}
 \end{frame}
@@ -293,16 +305,16 @@ It appears that the tools helped at safe IoT device updating are the same tools 
 \begin{frame}[fragile]{Moo in background}
 \begin{block}{Moo in background}
 \begin{itemize}
-\item manage database connections based on concerns
-\item<2-> manage \texttt{CI} structures based on relations
-\item<3-> manage Web-API integration
+\item Manage database connections based on concerns
+\item<2-> Manage \texttt{CI} structures based on relations
+\item<3-> Manage Web-API integration
 \end{itemize}
 \end{block}
 \end{frame}
 
 \subsection{Reflecting Relationships}
 
-\begin{frame}[fragile]{}
+\begin{frame}[fragile]{Craziness}
 \begin{block}{Crazy}
 \begin{aquote}{Lewis Carroll}
 I'm not crazy. My reality is just different than yours. \\
@@ -312,21 +324,22 @@ The Cheshire Cat \\
 \end{block}
 \end{frame}
 
-\begin{frame}[fragile]{}
+\begin{frame}[fragile]{Harmonization}
 \begin{block}{Harmonize Craziness}
 \begin{itemize}
-\item practically any administrator had a different background regarding to the platform components thus a different picture of their relationships
+\item Practically any administrator had a different background regarding to the platform components thus a different picture of their relationships
 \item<2-> EPIC battles leads to common craziness
-\item<3-> ER model analysis sessions uncover holes in picture
+\item<3-> ER model analysis sessions uncovered holes in picture
 \end{itemize}
 \end{block}
 \end{frame}
 
 \subsection{Meanwhile}
 
-\begin{frame}[fragile]{}
+\begin{frame}[fragile]{Civilized}
 \begin{block}{}
 \begin{aquote}{Lewis Carroll}
+\small
 March Hare: Have some wine. \\
 (Alice looked all round the table, but there was nothing on it but tea.) \\
 Alice: I don't see any wine. \\
@@ -338,16 +351,16 @@ March Hare: It wasn't very civil of you to sit down without being invited. \\
 \end{block}
 \end{frame}
 
-\begin{frame}[fragile]{New Goal}
-\begin{block}{CentOS 5 ends it's maintenance}
+\begin{frame}[fragile]{Adding a Goal}
+\begin{block}{CentOS 5 ends its maintenance}
 \begin{itemize}
-\item many of existing tools needs to be upgraded
+\item Many of existing tools need to be upgraded
 \item<2-> Upgraded tools don't support existing hacks anymore
-\item<3-> existing hacks must be replaced by a reasonable configuration structure
+\item<3-> Existing hacks must be replaced by a reasonable configuration structure
 \item<4-> Same problem like the report format:
 \begin{itemize}
 \item<5-> neither the ER model of platform components nor issues of platform where known
-\item<6-> neither cared about
+\item<6-> nor cared about
 \end{itemize}
 \end{itemize}
 \end{block}
@@ -357,10 +370,10 @@ March Hare: It wasn't very civil of you to sit down without being invited. \\
 \begin{block}{Delegation}
 We learned from mistakes of past:
 \begin{itemize}
-\item<2-> No responsibility taken for fill weird puppet templates
+\item<2-> No responsibility taken for filling weird puppet templates
 \item<3-> No external data will be managed
 \item<4-> No precompiled/puzzled resources are prepared
-\item[$\rightarrow$]<5-> ER model of \texttt{CMDB} is presented via \textit{RESTful API}
+\item[$\Rightarrow$]<5-> ER model of \texttt{CMDB} is presented via \textit{RESTful API}
 \end{itemize}
 \end{block}
 \end{frame}
@@ -372,76 +385,227 @@ We learned from mistakes of past:
 \begin{itemize}
 \item Early implementation of above mentioned \textit{RESTful API} run against \textit{ScanDB}
 \item<2-> \textit{ScanDB} represents just a view of the configuration snapshot
-\item<3-> There is no future\uncover<4->{, neither past}
+\item<3-> There is no future\uncover<4->{, nor past}
 \item<5-> Time for \textit{CMDB} to enter the stage
 \end{itemize}
 \end{block}
 \end{frame}
 
+\subsection{Future and Past}
+
 \begin{frame}[fragile]{}
-\begin{block}{Future and Past}
+\begin{block}{Customers \ldots}
 \scriptsize
 \begin{lstlisting}[language=SQL,inputencoding=latin9,escapeinside={(*@}{@*)}]
-CREATE TABLE author
+CREATE TABLE customer_t
 (
-      author_id INTEGER PRIMARY KEY
+      customer(*@\pnode(0,0){A}{}@*)_id INTEGER PRIMARY KEY
     -- entity stuff
-    , author_name VARCHAR(80) NOT NULL
-    , author_birthday DATETIME NOT NULL
-    , author_died_at DATETIME
+    , c(*@\pnode(0,0){B}{}@*)ustomer_name VARCHAR(80) UNIQUE NOT NULL
     -- cmdb stuff
-    , valid_from DATETIME NOT NULL
-    , valid_to DATETIME
-    , modified_at DATETIME NOT NULL
-    , modified_by VARCHAR(32) NOT NULL
+    , valid(*@\pnode(0,0){C1}{}@*)_from DATETIME NOT NULL
+    , valid(*@\pnode(0,0){C2}{}@*)_to DATETIME
+    , modified(*@\pnode(0,0){C3}{}@*)_at DATETIME NOT NULL
+    , modified(*@\pnode(0,0){C4}{}@*)_by VARCHAR(32) NOT NULL
 );
 \end{lstlisting}
 \end{block}
+
+\begin{itemize}
+\item<2-> primary key and \rnode{a}{global identifier} for this data type
+\item<3-> the \rnode{b}{payload} of this data type, automatically indexed
+\item<4-> CMDB manages history and updates using \rnode{c}{these} columns
+\end{itemize}
+\uncover<2>{\nccurve[linecolor=blue]{->}{a}{A}}
+\uncover<3>{\nccurve[linecolor=teal]{->}{b}{B}}
+\uncover<4>{\nccurve[linecolor=violet]{->}{c}{C1}
+            \nccurve[linecolor=violet]{->}{c}{C2}
+	    \nccurve[linecolor=violet]{->}{c}{C3}
+	    \nccurve[linecolor=violet]{->}{c}{C4}
+}
 \end{frame}
 
 \begin{frame}[fragile]{}
-\begin{block}{Future and Past}
+\begin{block}{VPN links to customers \ldots}
 \scriptsize
 \begin{lstlisting}[language=SQL,inputencoding=latin9,escapeinside={(*@}{@*)}]
-CREATE TABLE book
+CREATE TABLE vpn_link_t
 (
-      book_id INTEGER PRIMARY KEY
+      vpn_link_id INTEGER PRIMARY KEY
     -- entity stuff
-    , book_name VARCHAR(80) NOT NULL
-    , book_subtitle VARCHAR(80)
-    , book_edition INTEGER
+    , customer_i(*@\pnode(0,0){A}{}@*)d INTEGER NOT NULL
+    , v(*@\pnode(0,0){B}{}@*)pn_link_type VARCHAR(12)
+    , custom(*@\pnode(0,0){C1}{}@*)er_net VARCHAR(64) UNIQUE NOT NULL
+    , servic(*@\pnode(0,0){C2}{}@*)es_net VARCHAR(64) UNIQUE NOT NULL
     -- cmdb stuff
     , valid_from DATETIME NOT NULL
     , valid_to DATETIME
     , modified_at DATETIME NOT NULL
     , modified_by VARCHAR(32) NOT NULL
+    -- FK
+    , FOREIGN KEY (customer_id) REFERENCES customer_t(customer_id)
+      ON UPDATE CASCADE ON DELETE CASCADE
 );
 \end{lstlisting}
 \end{block}
+
+\begin{itemize}
+\item<2-> refer the \rnode{a}{customer}
+\item<3-> \rnode{b}{support} Cisco, Juniper, Paolo Alto, \ldots
+\item<4-> networks must be unique or network \rnode{c}{admins kill} you
+\end{itemize}
+\uncover<2>{\nccurve[linecolor=teal]{->}{a}{A}}
+\uncover<3>{\nccurve[linecolor=blue]{->}{b}{B}}
+\uncover<4>{\nccurve[linecolor=blue]{->}{c}{C1}
+            \nccurve[linecolor=blue]{->}{c}{C2}
+}
 \end{frame}
 
 \begin{frame}[fragile]{}
-\begin{block}{Future and Past}
+\begin{block}{Moo Interception}
 \scriptsize
-\begin{lstlisting}[language=SQL,inputencoding=latin9,escapeinside={(*@}{@*)}]
-CREATE TABLE book_athors
-(
-      ba_id INTEGER PRIMARY KEY
-    -- entity stuff
-    , author_id INTEGER NOT NULL
-    , book_id INTEGER NOT NULL
-    -- cmdb stuff
-    , valid_from DATETIME NOT NULL
-    , valid_to DATETIME
-    , modified_at DATETIME NOT NULL
-    , modified_by VARCHAR(32) NOT NULL
-    -- 
-    , FOREIGN KEY (author_id) REFERENCES author(author_id) ON DELETE CASCADE
-    , FOREIGN KEY (book_id) REFERENCES book(book_id) ON DELETE CASCADE
-    , CONSTRAINT no_dup_book_author UNIQUE (author_id, book_id)
+\begin{lstlisting}[language=Perl,inputencoding=latin9,escapeinside={(*@}{@*)}]
+package Foo::Role::Database::CMDB;
+use Moo::Role(*@\pnode(0,0){A}{}@*);
+requires "log";
+
+has cmdb => (
+    is       => "ro",
+    required => 1,
+    handles  => "Foo::Role::Database",
+    isa      => sub {
+        _INSTANCE_OF($_[0], "Foo::Helper::CMDB") and $_[0]->DOES("Foo::Role::Database")
+          and return;
+        die "Insufficient initialisation parameter for cmdb";
+    },
+    c(*@\pnode(0,0){B}{}@*)oerce => sub {
+        _HASH($_[0]) and return Foo::Helper::CMDB->new(%{$_[0]});
+        $_[0];
+    },
 );
 \end{lstlisting}
 \end{block}
+
+\begin{itemize}
+\item<2-> role can be \rnode{a}{consumed} by any class needing access to CMDB
+\item<3-> \rnode{b}{transform} hash initializer into object
+\end{itemize}
+\uncover<2>{\nccurve[linecolor=olive]{->}{a}{A}}
+\uncover<3>{\nccurve[linecolor=olive]{->}{b}{B}}
+\end{frame}
+
+\begin{frame}[fragile]{}
+\begin{block}{Hard work}
+\scriptsize
+\begin{lstlisting}[language=Perl,inputencoding=latin9,escapeinside={(*@}{@*)}]
+package Foo::Helper::CMDB;
+use Moo; extends "Foo::Helper::DatabaseClass";
+has config(*@\pnode(0,0){A}{}@*)_tables => (is => "lazy", ...);
+has history_tabl(*@\pnode(0,0){B}{}@*)es => (is => "lazy", ...);
+around deploy => sub { ...
+my @tables = @{$self->config_tables};
+foreach my $tbl (@tables) {
+  my @h(*@\pnode(0,0){C}{}@*)ist_coldefs =
+    map { my $default = defined $_->[4] ? " DEFAULT $_->[4]" : "";
+      $pure_cols{$_->[1]} ? ("$_->[1] $_->[2]$default")
+	: ("ol(*@\pnode(0,0){D}{}@*)d_$_->[1] $_->[2]$default", "n(*@\pnode(0,0){E}{}@*)ew_$_->[1] $_->[2]$default")
+    } @table_info;
+}
+unshift @hist_coldefs, "${base_name}_hist_id INTEGER PRIMARY KEY";
+my $hist_defs = join("\n    , ", @hist_coldefs);
+my $hist_tbl = <<EOCHT;
+CREAT(*@\pnode(0,0){F}{}@*)E TABLE ${base_name}_hist (
+      ${hist_defs}
+);
+EOCHT
+\end{lstlisting}
+\end{block}
+
+\begin{itemize}
+\item<2-> that \rnode{a}{are} all tables with trailing \texttt{\_t} in their names
+\item<3-> \rnode{f}{create} \rnode{b}{history} table for each config table
+\item<4-> \rnode{c}{memoizing} \rnode{d}{old} and \rnode{e}{new} values on updating payload
+\end{itemize}
+\uncover<2>{\nccurve[linecolor=blue]{->}{a}{A}}
+\uncover<3>{\nccurve[linecolor=olive]{->}{b}{B}
+            \nccurve[linecolor=olive]{->}{f}{F}}
+\uncover<4>{\nccurve[linecolor=violet]{->}{c}{C}
+            \nccurve[linecolor=violet]{->}{d}{D}
+	    \nccurve[linecolor=violet]{->}{e}{E}}
+\end{frame}
+
+\begin{frame}[fragile]{}
+\begin{block}{Hard work (continued) - INSERT}
+\scriptsize
+\begin{lstlisting}[language=Perl,inputencoding=latin9,escapeinside={(*@}{@*)}]
+my $new_cols = join(", ", map { $pure_cols{$_} ? $_ : "new_$_" }
+               grep { !$skipped{$_} } @table_cols);
+my $new_vals = join(", ", map {"NEW.$_"} grep { !$skipped{$_} } @table_cols);
+
+my $new_trgr = <<EONT;
+CREATE TRIGGER new_${base_name}_row AFTER INSERT ON ${base_name}_t
+BEGIN
+  INSERT INTO ${base_name}_hist ($new_cols)
+  VALUES ($new_vals);
+END;
+EONT
+\end{lstlisting}
+\end{block}
+
+
+\begin{itemize}
+\item[$\Rightarrow$]<2-> ON INSERT fill history rows without filling "OLD\_" columns
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{}
+\begin{block}{Hard work (continued) - UPDATE}
+\scriptsize
+\begin{lstlisting}[language=Perl,inputencoding=latin9,escapeinside={(*@}{@*)}]
+my (@updt_cols, @rfrs_cond, @updt_vals);
+foreach my $colnm (grep { !$skipped{$_} } @table_cols) {
+  my @lcd = $pure_cols{$colnm} ? $colnm : ("old_${colnm}", "new_${colnm}");
+  push @updt_cols, @lcd;
+  push @rfrs_cond, $pure_cols{$colnm}
+    ? _cmp_if_nullable("existing.${colnm}", "NEW.${colnm}")
+    : (_cmp_if_nullable("existing.old_${colnm}", "OLD.${colnm}"),
+       _cmp_if_nullable("existing.new_${colnm}", "NEW.${colnm}"));
+  push @updt_vals, $pure_cols{$colnm}?("NEW.$colnm"):("OLD.$colnm","NEW.$colnm");
+}
+my $updt_cols = join(", ", @updt_cols);
+my $updt_refreshed_cols = join(", ", map { "refreshed.$_" } @updt_cols);
+my $updt_vals = join(", ", @updt_vals);
+\end{lstlisting}
+\end{block}
+
+\begin{itemize}
+\item[$\Rightarrow$]<2-> Prepare for a bit complexer trigger
+\item[$\Rightarrow$]<3-> Distinguish between real updates and just ''touches''
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{}
+\begin{block}{Hard work (continued) - UPDATE}
+\scriptsize
+\begin{lstlisting}[language=SQL,inputencoding=latin9,escapeinside={(*@}{@*)}]
+my $updt_trgr = <<EONT;
+CREATE TRIGGER updt_${base_name}_row AFTER UPDATE ON ${base_name}_t
+BEGIN
+  INSERT OR REPLACE INTO ${base_name}_hist (${base_name}_hist_id, $updt_cols)
+  VALUES (
+    (SELECT MAX(existing.${base_name}_hist_id) ${base_name}_hist_id
+     FROM ${base_name}_hist existing WHERE $updt_refreshed_cond),
+    $updt_vals);
+END;
+EONT
+\end{lstlisting}
+\end{block}
+
+\begin{itemize}
+\item[$\Rightarrow$]<2-> ON UPDATE create history (\texttt{INSERT}) rows with "OLD\_"  and "NEW\_" columns \\
+\uncover<3->{ except nothing changes (\texttt{REPLACE})}
+\end{itemize}
 \end{frame}
 
 \subsection{Features}
@@ -471,24 +635,38 @@ CREATE TABLE book_athors
 \begin{block}{Perl helps out}
 \scriptsize
 \begin{lstlisting}[language=Perl,inputencoding=latin9,escapeinside={(*@}{@*)}]
-{
-    my $goethe_id = $self->cmdb->upsert( "author",
-      { author_name => "Johann Wolfgang von Goethe",
-        author_birthday => "28 August 1749",
-	author_died_at => "22 March 1832" } )->[0]->[0];
-    my $faust_id = $self->cmdb->upsert( "book",
-      { book_name => "Faust. Der Tragödie erster Teil" } )->[0]->[0];
-    my $faust_author => $self->cmdb->upsert( "book_athors",
-      { author_id => $goethe_id, book_id => $faust_id } )->[]->[];
-}
+  $self->cmdb->upsert( customer_t => {
+    customer_name => "Foo Enterprises", });
+  $self->cmdb->upsert( vpn_link_t => {
+    customer_name => "Foo Enterprises",
+    vpn_link_type => "Juniper",
+    customer_net  => "10.116.47.8/29",
+    services_net  => "10.126.47.8/29" } );
 \end{lstlisting}
 \end{block}
 
-\begin{block}<2->{}
+\begin{block}{SQL created \ldots}
+\scriptsize
+\begin{lstlisting}[language=SQL,inputencoding=latin9,escapeinside={(*@}{@*)}]
+INSERT OR IGNORE INTO vpn_link_t (
+  customer_id, vpn_link_type, customer_net, services_net, modified_by
+) VALUES (
+  (SELECT customer_id FROM customer_t WHERE customer_name=?),
+  ?, ?, ?, ?);
+UPDATE vpn_link_t SET vpn_link_type=?, customer_net=?, services_net=?,
+  modified_by=?, touched_at=CURRENT_TIMESTAMP
+WHERE changes()=0 AND customer_id=(
+  SELECT customer_id FROM customer_t WHERE customer_name=?);
+\end{lstlisting}
+\end{block}
+\end{frame}
+
+\begin{frame}[fragile]{}
+\begin{block}{Known limitations}
 \begin{itemize}
-\item Limited to CMDB
-\item<3-> Refuse updates of identifying columns (UNIQUE constraints)
-\item<4-> WHERE clause derived from UNIQUE constraints
+\item Restricted to CMDB
+\item<2-> Refuse updates of identifying columns (UNIQUE constraints)
+\item<3-> WHERE clause derived from UNIQUE constraints
 \end{itemize}
 \end{block}
 \end{frame}
@@ -500,7 +678,7 @@ CREATE TABLE book_athors
 \begin{itemize}
 \item Development team read via \textit{RESTful API} the theoretical configuration set
 \item<2-> \textit{Hiera} \texttt{YAML} files are written
-\item<3-> additional exports are managed via \textit{Hiera}
+\item<3-> Additional exports are managed via \textit{Hiera}
 \item<4-> Puppet classes are rewritten to understand new ER model
 \end{itemize}
 \end{block}
@@ -518,14 +696,47 @@ CREATE TABLE book_athors
 
 \section{Goals reached}
 
+\subsection{Circle closed}
+
+\begin{frame}[fragile]{Circle closed}
+\begin{block}{}
+
+\resizebox{0.9\textwidth}{!}{
+\begin{pspicture}(-7,-5)(7,5)%\psgrid
+     % 
+     \uput{4}[90](0,0){\rnode{platform}{\umlClass{\underline{:platform}}{}}}
+     \uput{4}[18](0,0){\rnode{snapshot}{\umlClass{\underline{:snapshot}}{}}}
+     \uput{4}[306](0,0){\rnode{scandb}{\umlClass{\underline{:scan\_db}}{}}}
+     \uput{4}[234](0,0){\rnode{cmdb}{\umlClass{\underline{:cmdb}}{}}}
+     \uput{4}[162](0,0){\rnode{hiera}{\umlClass{\underline{:hiera}}{}}}
+     \rput(-6,-4){\rnode{report}{\umlClass{\underline{:report}}{}}}
+
+     \ncarc[arcangle=30,linewidth=0.5pt,linestyle=solid]{->}{platform}{snapshot}\naput*[Ynodesep=0.5]{collect}
+     \ncarc[arcangle=30,linewidth=0.5pt,linestyle=solid,linecolor=red]{->}{snapshot}{scandb}\naput*[Ynodesep=0.5]{scan}
+     \ncarc[arcangle=30,linewidth=0.5pt,linestyle=solid,linecolor=red]{->}{scandb}{cmdb}\naput*[Ynodesep=0.5]{process-scan}
+     \ncarc[arcangle=30,linewidth=0.5pt,linestyle=solid,linecolor=red]{->}{cmdb}{hiera}\naput*[Ynodesep=0.5]{yaml-gen}
+     \ncarc[arcangle=30,linewidth=0.5pt,linestyle=solid]{->}{hiera}{platform}\naput*[Ynodesep=0.5]{puppet run}
+     \nccircle[angleA=-40,angleB=90,arm=.8,linearc=.2,linewidth=0.5pt,linestyle=solid,linecolor=red]{->}{cmdb}{1cm}\naput*[Ynodesep=0.5]{CRQ}
+     \ncarc[arcangle=30,linewidth=0.5pt,linestyle=solid]{->}{cmdb}{report}\naput*[Ynodesep=0.5]{export}
+
+     \uncover<2->{\ncarc[arcangle=30,linewidth=0.5pt,linestyle=solid,linecolor=blue]{->}{snapshot}{scandb}\naput*[Ynodesep=0.5]{scan}}
+     \uncover<2->{\ncarc[arcangle=30,linewidth=0.5pt,linestyle=solid,linecolor=blue]{->}{scandb}{cmdb}\naput*[Ynodesep=0.5]{process-scan}}
+     \uncover<2->{\ncarc[arcangle=30,linewidth=0.5pt,linestyle=solid,linecolor=blue]{->}{cmdb}{hiera}\naput*[Ynodesep=0.5]{yaml-gen}}
+     \uncover<2->{\nccircle[angleA=-40,angleB=90,arm=.8,linearc=.2,linewidth=0.5pt,linestyle=solid,linecolor=cyan]{->}{cmdb}{1cm}\naput*[Ynodesep=0.5]{CRQ}}
+
+\end{pspicture}
+}%end resizebox
+
+\end{block}
+\end{frame}
+
 \begin{frame}[fragile]{}
 \begin{block}{Goals reached}
 \begin{itemize}
-\item[$\rightarrow$] Circle closed
-\item[$\rightarrow$]<2-> actual-theoretical comparison done via processing scan database
-\item[$\rightarrow$]<3-> unmaintainted installation via cronjob possible
-\item[$\rightarrow$]<4-> reaction in emergency cases by organized component moving done multiple times
-\item[$\rightarrow$]<5-> monitoring, sensors, alarming open
+\item[$\rightarrow$] Actual-theoretical comparison done via processing scan database
+\item[$\rightarrow$]<2-> Unmaintainted installation via cronjob possible
+\item[$\rightarrow$]<3-> Reaction in emergency cases by organized component moving done multiple times
+\item[$\rightarrow$]<4-> Monitoring, sensors, alarming open
 \end{itemize}
 \end{block}
 \end{frame}
@@ -535,20 +746,12 @@ CREATE TABLE book_athors
 \begin{frame}[fragile]{Conclusion}
 \begin{block}{Can a programming language save a life}
 \begin{itemize}
-\item Yes, it can - but here is saves our business
+\item Yes, it can - but here it saves our business
 \end{itemize}
 \end{block}
 \end{frame}
 
 \section{Thank you}
-
-\subsection{Hiring}
-
-\begin{frame}[fragile]{We are hiring}
-\begin{block}{New Job?}
-Ask me for details
-\end{block}
-\end{frame}
 
 \subsection{Thank you}
 
